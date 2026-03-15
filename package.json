@@ -1,0 +1,25 @@
+{
+  "name": "drowsycraft-1",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/ABZ-Digital-Group/DrowsyCraft#readme",
+  "bugs": {
+    "url": "https://github.com/ABZ-Digital-Group/DrowsyCraft/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ABZ-Digital-Group/DrowsyCraft.git"
+  },
+  "license": "ISC",
+  "author": "ABZ DIGITAL GROUP",
+  "type": "commonjs",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "ejs": "^5.0.1",
+    "express": "^5.2.1"
+  }
+}
