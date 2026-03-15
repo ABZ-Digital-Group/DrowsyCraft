@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DrowsyCraft | The Frontier is Calling</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-color: #060709;
+            --text-main: #FFFFFF;
+            --accent-blue: #7DD3F7; 
+            --accent-glow: rgba(125, 211, 247, 0.4);
+            --glass-bg: rgba(255, 255, 255, 0.03);
+            --font-main: 'Inter', sans-serif;
+        }
+
+        /* --- GLOBAL RESET & SCROLL UNLOCK --- */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: var(--font-main);
+            overflow-x: hidden;
+            overflow-y: auto; 
+            line-height: 1.6;
+        }
+
+        /* --- HERO SECTION (Screen 1) --- */
+        .hero-section {
+            min-height: 100vh;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            text-align: center;
+            padding: 60px 20px;
+            gap: 20px; /* Prevents overlapping of all elements */
+        }
+
+        .est-tag {
+            font-size: 0.8rem;
+            letter-spacing: 0.4rem;
+            color: #555;
+            text-transform: uppercase;
+        }
+
+        .logo-container {
+            font-size: clamp(3.5rem, 12vw, 7rem);
+            font-weight: 900;
+            letter-spacing: -4px;
+            text-transform: uppercase;
+            display: flex;
+            line-height: 1;
+        }
+
+        .logo-white { color: #FFFFFF; }
+        .logo-blue {
+            color: var(--accent-blue);
+            text-shadow: 0 0 30px var(--accent-glow), 0 0 60px var(--accent-glow);
+        }
+
+        .motto {
+            font-weight: 300;
+            color: #999;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            max-width: 600px;
+        }
+
+        /* Action Area handles the IP box and Button spacing */
+        .action-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 25px; /* Fixed the overlap between IP box and Discord Button */
+            margin-top: 20px;
+        }
+
+        .ip-box {
+            background: var(--glass-bg);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 18px 50px;
+            border-radius: 60px;
+            font-family: 'Courier New', monospace;
+            font-weight: 700;
+            letter-spacing: 3px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .ip-box:hover {
+            border-color: var(--accent-blue);
+            background: rgba(125, 211, 247, 0.08);
+            transform: scale(1.05);
+        }
+
+        .btn-main {
+            background-color: var(--accent-blue);
+            color: #000;
+            padding: 16px 45px;
+            border-radius: 12px;
+            font-weight: 800;
+            text-decoration: none;
+            transition: 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            display: inline-block;
+        }
+
+        .btn-main:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px var(--accent-glow);
+        }
+
+        /* --- ENLARGED ABOUT SECTION (Screen 2) --- */
+        .about-glass-section {
+            padding: 200px 20px;
+            display: flex;
+            justify-content: center;
+            background: #060709;
+            position: relative;
+        }
+
+        .about-content {
+            max-width: 1100px;
+            width: 100%;
+            z-index: 2;
+        }
+
+        .about-card {
+            background: rgba(255, 255, 255, 0.02);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(135, 206, 235, 0.15);
+            border-radius: 60px;
+            padding: 120px 80px;
+            text-align: center;
+            margin-bottom: -180px; 
+            position: relative;
+            z-index: 5;
+            box-shadow: 0 60px 150px rgba(0,0,0,0.95);
+        }
+
+        .label-glow {
+            font-size: 0.9rem;
+            letter-spacing: 6px;
+            color: var(--accent-blue);
+            text-transform: uppercase;
+            font-weight: 700;
+        }
+
+        .title-large {
+            font-size: clamp(2.5rem, 8vw, 5rem);
+            font-weight: 900;
+            margin: 30px 0;
+            line-height: 0.95;
+            letter-spacing: -3px;
+        }
+
+        .sky-text { color: var(--accent-blue); }
+
+        .divider {
+            width: 80px;
+            height: 5px;
+            background: var(--accent-blue);
+            margin: 40px auto;
+            border-radius: 10px;
+        }
+
+        .story-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            text-align: left;
+            margin: 60px 0;
+        }
+
+        .story-col p { 
+            color: #a1a1aa; 
+            font-size: 1.25rem; 
+            line-height: 1.8;
+        }
+
+        /* --- FIXED CENTERED STATS --- */
+.about-stats-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr 1fr !important; /* Forces 3 equal columns */
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 20px !important; /* Controlled gap */
+    border-top: 1px solid rgba(255,255,255,0.08) !important;
+    padding-top: 60px !important;
+    margin: 0 auto 40px auto !important;
+    max-width: 800px !important; /* Keeps them from spreading too far */
+}
+
+.stat-box {
+    text-align: center !important; /* Ensures text stays centered in its column */
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+}
+
+.s-num { 
+    font-size: 3.5rem !important; 
+    font-weight: 900 !important; 
+    line-height: 1 !important;
+    margin-bottom: 10px !important;
+    display: block !important;
+}
+
+.s-label { 
+    font-size: 0.85rem !important; 
+    color: var(--accent-blue) !important; 
+    letter-spacing: 4px !important; 
+    text-transform: uppercase !important;
+}
+
+        .btn-war {
+            display: inline-block;
+            border: 1px solid var(--accent-blue);
+            color: var(--accent-blue);
+            padding: 15px 45px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            transition: 0.3s;
+        }
+
+        .btn-war:hover {
+            background: var(--accent-blue);
+            color: #000;
+            box-shadow: 0 0 30px var(--accent-glow);
+        }
+
+        /* --- EPIC IMAGE FRAME --- */
+        .epic-frame {
+            width: 100%;
+            height: 700px;
+            border-radius: 60px;
+            overflow: hidden;
+            position: relative;
+            border: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .epic-frame img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            opacity: 0.4;
+        }
+
+        .overlay-gradient {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to bottom, #060709 0%, transparent 40%, transparent 60%, #060709 100%);
+        }
+
+        /* --- FOOTER --- */
+        .footer-stats {
+            padding: 100px 20px;
+            text-align: center;
+            background: #000;
+            border-top: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .frontier-call {
+            font-weight: 900;
+            font-size: 2rem;
+            letter-spacing: 4px;
+            text-transform: uppercase;
+            margin-bottom: 15px;
+        }
+
+        .sub-text { font-size: 0.9rem; color: #555; margin-bottom: 8px; letter-spacing: 1px; }
+
+        /* Responsive */
+        @media (max-width: 900px) {
+            .story-grid { grid-template-columns: 1fr; }
+            .about-card { padding: 60px 30px; }
+            .about-stats-row { gap: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="hero-section">
+        <div class="est-tag">EST. 2026</div>
+
+        <div class="logo-container">
+            <span class="logo-white">DROWSY</span><span class="logo-blue">CRAFT</span>
+        </div>
+
+        <div class="motto">The Drowsy Frontier is Calling.</div>
+
+        <div class="action-area">
+            <div class="ip-box" id="ipBox" onclick="copyIP()">
+                Coming Soon...
+            </div>
+            <a href="https://discord.gg/drowsyvocals" class="btn-main">Join Discord</a>
+        </div>
+    </div>
+
+    <section id="about" class="about-glass-section">
+        <div class="about-content">
+            <div class="about-card">
+                <div class="label-glow">THE GENESIS</div>
+                <h2 class="title-large">Where Sound <br>Meets <span class="sky-text">Steel</span></h2>
+                
+                <div class="divider"></div>
+                
+                <div class="story-grid">
+                    <div class="story-col">
+                        <p>Established in 2026, <strong>DrowsyCraft</strong> was born from the creative pulse of <strong>Drowsy Vocals</strong>. We believe the same precision used to master a vocal track is required to master an empire.</p>
+                    </div>
+                    <div class="story-col">
+                        <p>In the <em>DrowsyCraft</em>, we provide the canvas for your legacy. Join a high-fidelity ecosystem designed for the ambitious, the creative, and the bold.</p>
+                    </div>
+                </div>
+
+                <div class="about-stats-row">
+                    <div class="stat-box">
+                        <span class="s-num">2020</span>
+                        <span class="s-label">FOUNDED</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="s-num">6000+</span>
+                        <span class="s-label">Members</span>
+                    </div>
+                    <div class="stat-box">
+                        <span class="s-num">100%</span>
+                        <span class="s-label">COMMUNITY DRIVEN</span>
+                    </div>
+                </div>
+
+                <a href="https://discord.gg/drowsyvocals" class="btn-war">Enter the Discord</a>
+            </div>
+
+            <div class="epic-frame">
+                <img src="your-liquid-chrome-image.png" alt="Drowsy Art Overlay">
+                <div class="overlay-gradient"></div>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer-stats">
+        <div class="frontier-call">The Drowsy Frontier is Calling</div>
+        <div class="sub-text">Early Access Phase Coming Soon..</div>
+        <div class="sub-text">&copy; 2026 Drowsy Vocals | ABZ Digital Group</div>
+    </footer>
+
+    <script>
+        function copyIP() {
+            const ip = "play.drowsycraft.com";
+            navigator.clipboard.writeText(ip);
+            const box = document.getElementById('ipBox');
+            const originalText = box.innerText;
+            box.innerText = "IP COPIED!";
+            box.style.borderColor = "#7DD3F7";
+            
+            setTimeout(() => {
+                box.innerText = originalText;
+                box.style.borderColor = "rgba(255, 255, 255, 0.1)";
+            }, 2000);
+        }
+    </script>
+
+</body>
+</html>
