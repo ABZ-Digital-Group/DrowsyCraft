@@ -294,148 +294,103 @@
         .sub-text { font-size: 0.9rem; color: #555; margin-bottom: 8px; letter-spacing: 1px; }
 
 
-    .dc-store-wrap {
-        max-width: 1200px;
-        margin: 100px auto;
+.dc-store-wrap {
+        max-width: 1100px;
+        margin: 80px auto;
         padding: 0 20px;
         font-family: 'Montserrat', sans-serif;
         color: #ffffff;
     }
 
-    /* Terminal / Username Section */
-    .dc-terminal {
-        text-align: center;
-        margin-bottom: 80px;
-    }
-
+    /* Terminal Section */
+    .dc-terminal { text-align: center; margin-bottom: 60px; }
     .dc-badge {
         display: inline-block;
-        border: 1px solid #1f1f22;
+        border: 1px solid #222;
         padding: 4px 12px;
-        font-size: 0.65rem;
+        font-size: 10px;
         letter-spacing: 3px;
-        color: #88888e;
-        margin-bottom: 15px;
+        color: #666;
+        margin-bottom: 20px;
+        text-transform: uppercase;
     }
-
     .dc-terminal-title {
         font-weight: 900;
         text-transform: uppercase;
-        letter-spacing: 5px;
-        font-size: 1.2rem;
+        letter-spacing: 6px;
+        font-size: 1.4rem;
         margin-bottom: 30px;
-    }
-
-    .dc-input-wrap {
-        position: relative;
-        max-width: 350px;
-        margin: 0 auto;
     }
 
     #dc-username {
         background: transparent;
         border: none;
-        border-bottom: 1px solid #1f1f22;
+        border-bottom: 1px solid #222;
         color: #ffffff;
         width: 100%;
+        max-width: 300px;
         padding: 15px 0;
         text-align: center;
-        font-size: 0.9rem;
+        font-size: 1rem;
         letter-spacing: 2px;
         outline: none;
-        transition: all 0.4s ease;
+        transition: border-color 0.4s;
     }
+    #dc-username:focus { border-bottom-color: #ffffff; }
 
-    #dc-username:focus {
-        border-bottom-color: #ffffff;
-    }
-
-    /* Loader */
-    .dc-loader {
-        text-align: center;
-        letter-spacing: 5px;
-        color: #88888e;
-        font-size: 0.7rem;
-        padding: 50px;
-        text-transform: uppercase;
-    }
-
-    /* Category Headers */
-    .dc-cat-header {
-        border-bottom: 1px solid #1f1f22;
-        margin-bottom: 40px;
-        padding-bottom: 10px;
-    }
-
+    /* Grid Setup */
+    .dc-loader { text-align: center; letter-spacing: 4px; color: #444; padding: 40px; text-transform: uppercase; }
     .dc-cat-header h2 {
         font-weight: 900;
         text-transform: uppercase;
         letter-spacing: 4px;
-        font-size: 1.1rem;
+        font-size: 1.2rem;
+        border-bottom: 1px solid #111;
+        padding-bottom: 15px;
+        margin-bottom: 40px;
     }
-
-    /* Grid & Cards */
     .dc-package-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-        gap: 30px;
-        margin-bottom: 80px;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+        gap: 20px;
+        margin-bottom: 60px;
     }
 
+    /* Card & Button Styling (Matching Screenshot Fix) */
     .dc-package-card {
-        background: #050505;
-        border: 1px solid #1f1f22;
-        padding: 40px;
-        transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        background: #080808;
+        border: 1px solid #1a1a1a;
+        padding: 35px;
         display: flex;
         flex-direction: column;
-    }
-
-    .dc-package-card:hover {
-        border-color: #ffffff;
-        background: #0a0a0c;
-        transform: translateY(-5px);
-    }
-
-    .dc-pkg-name {
-        font-weight: 800;
-        letter-spacing: 1px;
-        text-transform: uppercase;
-        font-size: 1rem;
-        margin-bottom: 10px;
-    }
-
-    .dc-pkg-price {
-        font-weight: 300;
-        color: #88888e;
-        font-size: 1.3rem;
-        margin-bottom: 30px;
-    }
-
-    /* Buttons */
-    .dc-acquire-btn {
-        background: transparent;
-        border: 1px solid #1f1f22;
-        color: #ffffff;
-        padding: 14px;
-        font-weight: 900;
-        font-size: 0.7rem;
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        cursor: pointer;
         transition: all 0.3s ease;
+    }
+    .dc-package-card:hover { border-color: #333; background: #0c0c0c; }
+
+    .dc-pkg-name { font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; font-size: 1.1rem; }
+    .dc-pkg-price { color: #888; font-weight: 300; font-size: 1.2rem; margin-bottom: 30px; }
+
+    /* The "Acquire" Button Fix */
+    .dc-acquire-btn {
+        background: transparent !important;
+        border: 1px solid #333 !important;
+        color: #ffffff !important;
+        padding: 14px !important;
+        font-weight: 800 !important;
+        font-size: 11px !important;
+        letter-spacing: 3px !important;
+        text-transform: uppercase !important;
+        cursor: pointer !important;
+        transition: all 0.3s ease !important;
+        width: 100% !important;
+        border-radius: 0 !important; /* Sharp corners */
     }
 
     .dc-acquire-btn:hover {
-        background: #ffffff;
-        color: #000000;
-        border-color: #ffffff;
+        background: #ffffff !important;
+        color: #000000 !important;
+        border-color: #ffffff !important;
     }
-
-    .dc-acquire-btn:disabled {
-        opacity: 0.3;
-    }
-
     </style>
 </head>
 <body>
@@ -499,14 +454,16 @@
         </div>
     </section>
 
-    <div id="drowsy-store-module" class="dc-store-container">
-        <div id="dc-auth-section" style="text-align: center; margin-bottom: 50px;">
-            <h3 style="font-size: 0.8rem; letter-spacing: 3px; color: #ffffff; margin-bottom: 20px;">IDENTIFY PLAYER</h3>
-            <input type="text" id="dc-username" placeholder="MINECRAFT USERNAME" 
-                style="background: transparent; border: 1px solid #1f1f22; color: #ffffff; padding: 15px; width: 100%; max-width: 300px; font-family: 'Montserrat', sans-serif; text-align: center; outline: none; transition: border 0.3s;">
+    <div id="drowsy-store-module" class="dc-store-wrap">
+        <div class="dc-terminal">
+            <div class="dc-badge">EST. 2026</div>
+            <h2 class="dc-terminal-title">Identify Player</h2>
+            <div class="dc-input-wrap">
+                <input type="text" id="dc-username" placeholder="ENTER USERNAME" autocomplete="off">
+            </div>
         </div>
 
-        <div id="store-loader" class="dc-loader">SYNCING ECOSYSTEM DATA...</div>
+        <div id="store-loader" class="dc-loader">Syncing Ecosystem...</div>
         <div id="store-content"></div>
     </div>
 
@@ -544,7 +501,7 @@ document.addEventListener("DOMContentLoaded", () => {
             const json = await res.json();
             document.getElementById('store-loader').style.display = 'none';
             renderStore(json.data);
-        } catch (e) { document.getElementById('store-loader').innerText = "ECOSYSTEM OFFLINE."; }
+        } catch (e) { document.getElementById('store-loader').innerText = "SYSTEM OFFLINE"; }
     }
 
     function renderStore(categories) {
@@ -552,13 +509,13 @@ document.addEventListener("DOMContentLoaded", () => {
         let html = '';
         categories.forEach(cat => {
             if (!cat.packages.length) return;
-            html += `<div class="dc-category-section"><div class="dc-category-header"><h2>${cat.name}</h2></div><div class="dc-package-grid">`;
+            html += `<div class="dc-category-wrap"><div class="dc-cat-header"><h2>${cat.name}</h2></div><div class="dc-package-grid">`;
             cat.packages.forEach(pkg => {
                 html += `
                     <div class="dc-package-card">
-                        <h3 class="dc-package-name">${pkg.name}</h3>
-                        <div class="dc-package-price">${pkg.currency} ${pkg.total_price.toFixed(2)}</div>
-                        <button class="dc-btn" id="pkg-btn-${pkg.id}" onclick="handleAcquire(${pkg.id})">Acquire</button>
+                        <h3 class="dc-pkg-name">${pkg.name}</h3>
+                        <div class="dc-pkg-price">${pkg.currency} ${pkg.total_price.toFixed(2)}</div>
+                        <button class="dc-acquire-btn" id="btn-${pkg.id}" onclick="handlePurchase(${pkg.id})">Acquire</button>
                     </div>`;
             });
             html += `</div></div>`;
@@ -566,46 +523,32 @@ document.addEventListener("DOMContentLoaded", () => {
         container.innerHTML = html;
     }
 
-    window.handleAcquire = async function(packageId) {
-        const username = document.getElementById('dc-username').value.trim();
-        const btn = document.getElementById(`pkg-btn-${packageId}`);
-        
-        if (!username) {
-            document.getElementById('dc-username').style.borderColor = "#ff3333";
-            alert("Please enter your Minecraft Username first.");
-            return;
-        }
+    window.handlePurchase = async function(packageId) {
+        const user = document.getElementById('dc-username').value.trim();
+        const btn = document.getElementById(`btn-${packageId}`);
+        if (!user) { document.getElementById('dc-username').focus(); return; }
 
-        btn.innerText = "PROCESSING...";
+        btn.innerText = "AUTHENTICATING...";
         btn.disabled = true;
         
         try {
-            // 1. Create Basket WITH Username
             const bRes = await fetch(`${API_URL}/accounts/${TEBEX_TOKEN}/baskets`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    username: username,
-                    complete_url: window.location.href,
-                    cancel_url: window.location.href
-                })
+                body: JSON.stringify({ username: user, complete_url: window.location.href, cancel_url: window.location.href })
             });
             const bData = await bRes.json();
             const ident = bData.data.ident;
 
-            // 2. Add Package (This will work now because username is set)
             await fetch(`${API_URL}/baskets/${ident}/packages`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ package_id: packageId, quantity: 1 })
             });
 
-            // 3. Final Redirect
             window.location.href = `https://checkout.tebex.io/checkout/${ident}`;
-
         } catch (e) { 
-            console.error(e);
-            btn.innerText = "SYSTEM ERROR";
+            btn.innerText = "ERROR";
             btn.disabled = false;
         }
     };
