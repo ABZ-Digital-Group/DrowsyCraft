@@ -519,21 +519,27 @@
             }
         }
 
-        // 3. RENDER THE STORE IN YOUR EXISTING DIV
+        // 3. RENDER THE STORE
         function renderStore(categories) {
             const container = document.getElementById('store-content');
             
+            // --- ADD USERNAME INPUT UI ---
+            let html = `
+                <div style="margin-bottom: 40px; text-align: center;">
+                    <h3 style="color: #ffffff; letter-spacing: 2px; font-size: 1rem; margin-bottom: 15px;">ENTER MINECRAFT USERNAME TO ACQUIRE</h3>
+                    <input type="text" id="mc-username" placeholder="Username..." style="background: transparent; border: 1px solid #1f1f22; color: #ffffff; padding: 15px; width: 100%; max-width: 300px; font-family: 'Montserrat', sans-serif; font-size: 1rem; text-align: center; text-transform: none; outline: none; border-radius: 0;" oninput="window.updateUsername(this.value)">
+                </div>
+            `;
+
             categories.forEach(category => {
                 if (!category.packages || category.packages.length === 0) return;
 
-                const section = document.createElement('div');
-                section.className = 'dc-category-section';
-                
-                let html = `
-                    <div class="dc-category-header">
-                        <h2>${category.name}</h2>
-                    </div>
-                    <div class="dc-package-grid">
+                html += `
+                    <div class="dc-category-section">
+                        <div class="dc-category-header">
+                            <h2>${category.name}</h2>
+                        </div>
+                        <div class="dc-package-grid">
                 `;
 
                 category.packages.forEach(pkg => {
@@ -552,11 +558,16 @@
                     `;
                 });
 
-                html += `</div>`;
-                section.innerHTML = html;
-                container.appendChild(section);
+                html += `</div></div>`;
             });
+            
+            container.innerHTML = html;
         }
+
+        // Keep track of what they type in the box
+        window.updateUsername = function(val) {
+            currentPlayerUsername = val.trim();
+        };
 
         // 4. HANDLE CHECKOUT & REDIRECT
         window.purchasePackage = async function(packageId) {
