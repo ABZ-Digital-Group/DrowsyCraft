@@ -468,8 +468,14 @@
         </div>
     </section>
 
-    <div id="drowsy-store-module" class="store-container">
-        <div id="store-loader">SYNCING ECOSYSTEM DATA...</div>
+    <div id="drowsy-store-module" class="dc-store-container">
+        <div id="dc-auth-section" style="text-align: center; margin-bottom: 50px;">
+            <h3 style="font-size: 0.8rem; letter-spacing: 3px; color: #ffffff; margin-bottom: 20px;">IDENTIFY PLAYER</h3>
+            <input type="text" id="dc-username" placeholder="MINECRAFT USERNAME" 
+                style="background: transparent; border: 1px solid #1f1f22; color: #ffffff; padding: 15px; width: 100%; max-width: 300px; font-family: 'Montserrat', sans-serif; text-align: center; outline: none; transition: border 0.3s;">
+        </div>
+
+        <div id="store-loader" class="dc-loader">SYNCING ECOSYSTEM DATA...</div>
         <div id="store-content"></div>
     </div>
 
@@ -496,34 +502,26 @@
     </script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
-    // PUBLIC TOKEN FROM YOUR HEADLESS API SETTINGS
     const TEBEX_TOKEN = "1299r-1d1d2bfd59d894301fc64d0fee5cbd2ee94c7119"; 
     const API_URL = "https://headless.tebex.io/api";
 
-    // FETCH LISTINGS
+    fetchStoreData();
+
     async function fetchStoreData() {
         try {
             const res = await fetch(`${API_URL}/accounts/${TEBEX_TOKEN}/categories?includePackages=1`);
             const json = await res.json();
             document.getElementById('store-loader').style.display = 'none';
             renderStore(json.data);
-        } catch (e) { 
-            console.error("Store load failed:", e);
-            document.getElementById('store-loader').innerText = "ECOSYSTEM OFFLINE.";
-        }
+        } catch (e) { document.getElementById('store-loader').innerText = "ECOSYSTEM OFFLINE."; }
     }
 
-    // RENDER STORE UI
     function renderStore(categories) {
         const container = document.getElementById('store-content');
         let html = '';
         categories.forEach(cat => {
-            if (!cat.packages || !cat.packages.length) return;
-            html += `
-                <div class="dc-category-section">
-                    <div class="dc-category-header"><h2>${cat.name}</h2></div>
-                    <div class="dc-package-grid">
-            `;
+            if (!cat.packages.length) return;
+            html += `<div class="dc-category-section"><div class="dc-category-header"><h2>${cat.name}</h2></div><div class="dc-package-grid">`;
             cat.packages.forEach(pkg => {
                 html += `
                     <div class="dc-package-card">
@@ -537,18 +535,26 @@ document.addEventListener("DOMContentLoaded", () => {
         container.innerHTML = html;
     }
 
-    // REDIRECT LOGIC
     window.handleAcquire = async function(packageId) {
+        const username = document.getElementById('dc-username').value.trim();
         const btn = document.getElementById(`pkg-btn-${packageId}`);
-        btn.innerText = "INITIALIZING...";
+        
+        if (!username) {
+            document.getElementById('dc-username').style.borderColor = "#ff3333";
+            alert("Please enter your Minecraft Username first.");
+            return;
+        }
+
+        btn.innerText = "PROCESSING...";
         btn.disabled = true;
         
         try {
-            // A: Create Basket
+            // 1. Create Basket WITH Username
             const bRes = await fetch(`${API_URL}/accounts/${TEBEX_TOKEN}/baskets`, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({
+                    username: username,
                     complete_url: window.location.href,
                     cancel_url: window.location.href
                 })
@@ -556,27 +562,23 @@ document.addEventListener("DOMContentLoaded", () => {
             const bData = await bRes.json();
             const ident = bData.data.ident;
 
-            // B: Attempt to add package
-            // (Even if this fails with 422, the redirect below handles the login)
-            btn.innerText = "ROUTING...";
+            // 2. Add Package (This will work now because username is set)
             await fetch(`${API_URL}/baskets/${ident}/packages`, {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json', 'Accept': 'application/json'},
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify({ package_id: packageId, quantity: 1 })
             });
 
-            // C: Final Redirect to Checkout Ident
+            // 3. Final Redirect
             window.location.href = `https://checkout.tebex.io/checkout/${ident}`;
 
         } catch (e) { 
-            console.error("Redirecting to backup store...", e);
-            window.location.href = `https://drowsycraft.tebex.io`;
+            console.error(e);
+            btn.innerText = "SYSTEM ERROR";
+            btn.disabled = false;
         }
     };
-
-    fetchStoreData();
 });
 </script>
-
 </body>
 </html>
