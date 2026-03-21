@@ -494,12 +494,15 @@
             }, 2000);
         }
     </script>
-    <script>
+<script>
     document.addEventListener("DOMContentLoaded", () => {
         
         // 1. SET YOUR TEBEX PUBLIC TOKEN HERE
-        const TEBEX_TOKEN = "1299r-1d1d2bfd59d894301fc64d0fee5cbd2ee94c7119"; 
+        const TEBEX_TOKEN = "YOUR_PUBLIC_WEBSTORE_IDENTIFIER_HERE"; 
         const BASE_URL = `https://headless.tebex.io/api/accounts/${TEBEX_TOKEN}`;
+
+        // Global variable to store the username
+        let currentPlayerUsername = "";
 
         // 2. FETCH STORE DATA
         async function fetchStoreData() {
@@ -572,23 +575,47 @@
         // 4. HANDLE CHECKOUT & REDIRECT
         window.purchasePackage = async function(packageId) {
             const btn = document.getElementById(`pkg-btn-${packageId}`);
+
+            // Don't let them click if they haven't entered a username
+            if (currentPlayerUsername === "") {
+                const originalText = btn.innerText;
+                btn.innerText = "USERNAME REQUIRED";
+                btn.style.color = "#ffaa00";
+                btn.style.borderColor = "#ffaa00";
+                setTimeout(() => { 
+                    btn.innerText = originalText;
+                    btn.style.color = "#ffffff";
+                    btn.style.borderColor = "#1f1f22";
+                }, 2000);
+                document.getElementById('mc-username').focus();
+                return;
+            }
+
             btn.innerText = "PROCESSING...";
             btn.disabled = true;
 
             try {
-                // Create Basket
+                // A. Create Basket (NOW INCLUDING THE USERNAME)
                 const basketRes = await fetch(`${BASE_URL}/baskets`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         complete_url: window.location.href, 
-                        cancel_url: window.location.href    
+                        cancel_url: window.location.href,
+                        username: currentPlayerUsername // This fixes the undefined error!
                     })
                 });
+                
                 const basketData = await basketRes.json();
+                
+                // Safety check to ensure Tebex accepted the username
+                if (!basketData.data || !basketData.data.ident) {
+                     throw new Error("Invalid Username or Server Error");
+                }
+                
                 const basketIdent = basketData.data.ident;
 
-                // Add Item
+                // B. Add Item to Basket
                 btn.innerText = "AUTHENTICATING...";
                 await fetch(`${BASE_URL}/baskets/${basketIdent}/packages`, {
                     method: 'POST',
@@ -596,7 +623,7 @@
                     body: JSON.stringify({ package_id: packageId, quantity: 1 })
                 });
 
-                // Redirect to Secure Tebex Checkout
+                // C. Redirect to Secure Tebex Checkout
                 btn.innerText = "ROUTING...";
                 window.location.href = basketData.data.links.checkout;
 
