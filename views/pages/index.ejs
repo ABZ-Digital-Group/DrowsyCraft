@@ -294,103 +294,55 @@
         .sub-text { font-size: 0.9rem; color: #555; margin-bottom: 8px; letter-spacing: 1px; }
 
 
-.dc-store-wrap {
-        max-width: 1100px;
-        margin: 80px auto;
-        padding: 0 20px;
-        font-family: 'Montserrat', sans-serif;
-        color: #ffffff;
-    }
 
-    /* Terminal Section */
+    .dc-store-wrap { max-width: 1100px; margin: 80px auto; padding: 0 20px; font-family: 'Montserrat', sans-serif; color: #ffffff; }
     .dc-terminal { text-align: center; margin-bottom: 60px; }
-    .dc-badge {
-        display: inline-block;
-        border: 1px solid #222;
-        padding: 4px 12px;
-        font-size: 10px;
-        letter-spacing: 3px;
-        color: #666;
-        margin-bottom: 20px;
-        text-transform: uppercase;
-    }
-    .dc-terminal-title {
-        font-weight: 900;
-        text-transform: uppercase;
-        letter-spacing: 6px;
-        font-size: 1.4rem;
-        margin-bottom: 30px;
-    }
+    .dc-badge { display: inline-block; border: 1px solid #222; padding: 4px 12px; font-size: 10px; letter-spacing: 3px; color: #666; margin-bottom: 20px; text-transform: uppercase; }
+    .dc-terminal-title { font-weight: 900; text-transform: uppercase; letter-spacing: 6px; font-size: 1.4rem; margin-bottom: 30px; }
 
-    #dc-username {
-        background: transparent;
-        border: none;
-        border-bottom: 1px solid #222;
-        color: #ffffff;
-        width: 100%;
-        max-width: 300px;
-        padding: 15px 0;
-        text-align: center;
-        font-size: 1rem;
-        letter-spacing: 2px;
-        outline: none;
-        transition: border-color 0.4s;
-    }
+    #dc-username { background: transparent; border: none; border-bottom: 1px solid #222; color: #ffffff; width: 100%; max-width: 300px; padding: 15px 0; text-align: center; font-size: 1rem; letter-spacing: 2px; outline: none; transition: border-color 0.4s; }
     #dc-username:focus { border-bottom-color: #ffffff; }
 
-    /* Grid Setup */
     .dc-loader { text-align: center; letter-spacing: 4px; color: #444; padding: 40px; text-transform: uppercase; }
-    .dc-cat-header h2 {
-        font-weight: 900;
-        text-transform: uppercase;
-        letter-spacing: 4px;
-        font-size: 1.2rem;
-        border-bottom: 1px solid #111;
-        padding-bottom: 15px;
-        margin-bottom: 40px;
-    }
-    .dc-package-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-        gap: 20px;
-        margin-bottom: 60px;
-    }
+    
+    .dc-cat-header h2 { font-weight: 900; text-transform: uppercase; letter-spacing: 4px; font-size: 1.2rem; border-bottom: 1px solid #111; padding-bottom: 15px; margin-bottom: 40px; }
+    .dc-package-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 25px; margin-bottom: 60px; }
 
-    /* Card & Button Styling (Matching Screenshot Fix) */
-    .dc-package-card {
-        background: #080808;
-        border: 1px solid #1a1a1a;
-        padding: 35px;
-        display: flex;
-        flex-direction: column;
-        transition: all 0.3s ease;
+    .dc-package-card { background: #080808; border: 1px solid #1a1a1a; padding: 40px; display: flex; flex-direction: column; transition: all 0.3s ease; }
+    .dc-package-card:hover { border-color: #444; background: #0c0c0c; }
+
+    .dc-pkg-name { font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px; font-size: 1.2rem; }
+    .dc-pkg-price { color: #ffffff; font-weight: 300; font-size: 1.4rem; margin-bottom: 20px; }
+
+    /* Package Description Styling */
+    .dc-pkg-desc { 
+        color: #888; 
+        font-size: 0.85rem; 
+        line-height: 1.6; 
+        margin-bottom: 30px; 
+        flex-grow: 1; /* Pushes button to bottom */
+        border-top: 1px solid #111;
+        padding-top: 20px;
     }
-    .dc-package-card:hover { border-color: #333; background: #0c0c0c; }
+    .dc-pkg-desc ul { padding-left: 18px; list-style-type: square; }
+    .dc-pkg-desc li { margin-bottom: 8px; }
 
-    .dc-pkg-name { font-weight: 800; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 10px; font-size: 1.1rem; }
-    .dc-pkg-price { color: #888; font-weight: 300; font-size: 1.2rem; margin-bottom: 30px; }
-
-    /* The "Acquire" Button Fix */
     .dc-acquire-btn {
         background: transparent !important;
         border: 1px solid #333 !important;
         color: #ffffff !important;
-        padding: 14px !important;
-        font-weight: 800 !important;
-        font-size: 11px !important;
+        padding: 16px !important;
+        font-weight: 900 !important;
+        font-size: 10px !important;
         letter-spacing: 3px !important;
         text-transform: uppercase !important;
         cursor: pointer !important;
         transition: all 0.3s ease !important;
         width: 100% !important;
-        border-radius: 0 !important; /* Sharp corners */
+        border-radius: 0 !important;
     }
+    .dc-acquire-btn:hover { background: #ffffff !important; color: #000000 !important; border-color: #ffffff !important; }
 
-    .dc-acquire-btn:hover {
-        background: #ffffff !important;
-        color: #000000 !important;
-        border-color: #ffffff !important;
-    }
     </style>
 </head>
 <body>
@@ -473,21 +425,6 @@
         <div class="sub-text">&copy; 2026 Drowsy Vocals | ABZ Digital Group</div>
     </footer>
 
-    <script>
-        function copyIP() {
-            const ip = "play.drowsycraft.com";
-            navigator.clipboard.writeText(ip);
-            const box = document.getElementById('ipBox');
-            const originalText = box.innerText;
-            box.innerText = "IP COPIED!";
-            box.style.borderColor = "#7DD3F7";
-            
-            setTimeout(() => {
-                box.innerText = originalText;
-                box.style.borderColor = "rgba(255, 255, 255, 0.1)";
-            }, 2000);
-        }
-    </script>
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const TEBEX_TOKEN = "1299r-1d1d2bfd59d894301fc64d0fee5cbd2ee94c7119"; 
@@ -511,10 +448,12 @@ document.addEventListener("DOMContentLoaded", () => {
             if (!cat.packages.length) return;
             html += `<div class="dc-category-wrap"><div class="dc-cat-header"><h2>${cat.name}</h2></div><div class="dc-package-grid">`;
             cat.packages.forEach(pkg => {
+                // We inject the description here
                 html += `
                     <div class="dc-package-card">
                         <h3 class="dc-pkg-name">${pkg.name}</h3>
                         <div class="dc-pkg-price">${pkg.currency} ${pkg.total_price.toFixed(2)}</div>
+                        <div class="dc-pkg-desc">${pkg.description}</div>
                         <button class="dc-acquire-btn" id="btn-${pkg.id}" onclick="handlePurchase(${pkg.id})">Acquire</button>
                     </div>`;
             });
@@ -525,7 +464,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     window.handlePurchase = async function(packageId) {
         const user = document.getElementById('dc-username').value.trim();
-        const btn = document.getElementById(`btn-${packageId}`);
+        const btn = document.getElementById(`pkg-btn-${packageId}`);
         if (!user) { document.getElementById('dc-username').focus(); return; }
 
         btn.innerText = "AUTHENTICATING...";
