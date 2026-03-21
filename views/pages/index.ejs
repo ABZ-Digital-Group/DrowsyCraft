@@ -293,118 +293,149 @@
 
         .sub-text { font-size: 0.9rem; color: #555; margin-bottom: 8px; letter-spacing: 1px; }
 
-        /* Responsive */
-        @media (max-width: 900px) {
-            .story-grid { grid-template-columns: 1fr; }
-            .about-card { padding: 60px 30px; }
-            .about-stats-row { gap: 40px; }
-        }
-        /* --- DROWSYCRAFT STORE MODULE CSS --- */
-.store-container {
-    max-width: 1200px;
-    margin: 80px auto;
-    padding: 0 5%;
-    font-family: 'Montserrat', sans-serif;
-}
 
-#store-loader {
-    text-align: center;
-    padding: 50px 20px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    letter-spacing: 4px;
-    color: #88888e;
-    text-transform: uppercase;
-    animation: dc-pulse 2s infinite;
-}
+    .dc-store-wrap {
+        max-width: 1200px;
+        margin: 100px auto;
+        padding: 0 20px;
+        font-family: 'Montserrat', sans-serif;
+        color: #ffffff;
+    }
 
-@keyframes dc-pulse {
-    0% { opacity: 0.5; }
-    50% { opacity: 1; }
-    100% { opacity: 0.5; }
-}
+    /* Terminal / Username Section */
+    .dc-terminal {
+        text-align: center;
+        margin-bottom: 80px;
+    }
 
-.dc-category-section {
-    margin-bottom: 80px;
-}
+    .dc-badge {
+        display: inline-block;
+        border: 1px solid #1f1f22;
+        padding: 4px 12px;
+        font-size: 0.65rem;
+        letter-spacing: 3px;
+        color: #88888e;
+        margin-bottom: 15px;
+    }
 
-.dc-category-header {
-    border-bottom: 1px solid #1f1f22;
-    padding-bottom: 15px;
-    margin-bottom: 40px;
-}
+    .dc-terminal-title {
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 5px;
+        font-size: 1.2rem;
+        margin-bottom: 30px;
+    }
 
-.dc-category-header h2 {
-    font-size: 1.5rem;
-    letter-spacing: 3px;
-    color: #ffffff;
-    text-transform: uppercase;
-    font-weight: 900;
-    margin: 0;
-}
+    .dc-input-wrap {
+        position: relative;
+        max-width: 350px;
+        margin: 0 auto;
+    }
 
-.dc-package-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 30px;
-}
+    #dc-username {
+        background: transparent;
+        border: none;
+        border-bottom: 1px solid #1f1f22;
+        color: #ffffff;
+        width: 100%;
+        padding: 15px 0;
+        text-align: center;
+        font-size: 0.9rem;
+        letter-spacing: 2px;
+        outline: none;
+        transition: all 0.4s ease;
+    }
 
-.dc-package-card {
-    background-color: #0a0a0c;
-    border: 1px solid #1f1f22;
-    padding: 30px;
-    display: flex;
-    flex-direction: column;
-    transition: all 0.4s ease;
-}
+    #dc-username:focus {
+        border-bottom-color: #ffffff;
+    }
 
-.dc-package-card:hover {
-    border-color: #ffffff;
-    transform: translateY(-5px);
-}
+    /* Loader */
+    .dc-loader {
+        text-align: center;
+        letter-spacing: 5px;
+        color: #88888e;
+        font-size: 0.7rem;
+        padding: 50px;
+        text-transform: uppercase;
+    }
 
-.dc-package-name {
-    font-size: 1.2rem;
-    letter-spacing: 1px;
-    color: #ffffff;
-    font-weight: 800;
-    text-transform: uppercase;
-    margin: 0 0 10px 0;
-}
+    /* Category Headers */
+    .dc-cat-header {
+        border-bottom: 1px solid #1f1f22;
+        margin-bottom: 40px;
+        padding-bottom: 10px;
+    }
 
-.dc-package-price {
-    font-size: 1.5rem;
-    color: #88888e;
-    margin-bottom: 30px;
-    font-weight: 300;
-}
+    .dc-cat-header h2 {
+        font-weight: 900;
+        text-transform: uppercase;
+        letter-spacing: 4px;
+        font-size: 1.1rem;
+    }
 
-.dc-btn {
-    background-color: transparent;
-    color: #ffffff;
-    border: 1px solid #1f1f22;
-    padding: 15px;
-    text-align: center;
-    font-weight: 800;
-    font-size: 0.8rem;
-    text-transform: uppercase;
-    letter-spacing: 2px;
-    margin-top: auto;
-    cursor: pointer;
-    transition: all 0.3s;
-    width: 100%;
-}
+    /* Grid & Cards */
+    .dc-package-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 30px;
+        margin-bottom: 80px;
+    }
 
-.dc-btn:hover {
-    background-color: #ffffff;
-    color: #030303;
-    border-color: #ffffff;
-}
+    .dc-package-card {
+        background: #050505;
+        border: 1px solid #1f1f22;
+        padding: 40px;
+        transition: all 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        display: flex;
+        flex-direction: column;
+    }
 
-.dc-btn:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
+    .dc-package-card:hover {
+        border-color: #ffffff;
+        background: #0a0a0c;
+        transform: translateY(-5px);
+    }
+
+    .dc-pkg-name {
+        font-weight: 800;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        font-size: 1rem;
+        margin-bottom: 10px;
+    }
+
+    .dc-pkg-price {
+        font-weight: 300;
+        color: #88888e;
+        font-size: 1.3rem;
+        margin-bottom: 30px;
+    }
+
+    /* Buttons */
+    .dc-acquire-btn {
+        background: transparent;
+        border: 1px solid #1f1f22;
+        color: #ffffff;
+        padding: 14px;
+        font-weight: 900;
+        font-size: 0.7rem;
+        letter-spacing: 3px;
+        text-transform: uppercase;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .dc-acquire-btn:hover {
+        background: #ffffff;
+        color: #000000;
+        border-color: #ffffff;
+    }
+
+    .dc-acquire-btn:disabled {
+        opacity: 0.3;
+    }
+
     </style>
 </head>
 <body>
