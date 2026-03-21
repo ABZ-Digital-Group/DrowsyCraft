@@ -497,12 +497,24 @@
 <script>
     document.addEventListener("DOMContentLoaded", () => {
         
-        // 1. SET YOUR TEBEX PUBLIC TOKEN HERE
-        const TEBEX_TOKEN = "1299r-1d1d2bfd59d894301fc64d0fee5cbd2ee94c7119"; // I pulled this from your error log!
-        
+        const TEBEX_TOKEN = "1299r-1d1d2bfd59d894301fc64d0fee5cbd2ee94c7119"; 
         const API_URL = "https://headless.tebex.io/api";
 
-        // 2. FETCH STORE DATA
+        // --- NEW: CHECK IF USER JUST LOGGED IN ---
+        // If they just came back from typing their username on Tebex, the URL will have ?basket=...&package=...
+        const urlParams = new URLSearchParams(window.location.search);
+        const pendingBasket = urlParams.get('basket');
+        const pendingPackage = urlParams.get('package');
+
+        if (pendingBasket && pendingPackage) {
+            // They logged in! Let's finish adding the item and send them to checkout.
+            finishCheckout(pendingBasket, pendingPackage);
+        } else {
+            // Normal page load, fetch the store.
+            fetchStoreData();
+        }
+
+        // 1. FETCH STORE DATA
         async function fetchStoreData() {
             try {
                 const response = await fetch(`${API_URL}/accounts/${TEBEX_TOKEN}/categories?includePackages=1`);
@@ -520,7 +532,7 @@
             }
         }
 
-        // 3. RENDER THE STORE
+        // 2. RENDER THE STORE
         function renderStore(categories) {
             const container = document.getElementById('store-content');
             let html = ``;
@@ -545,7 +557,7 @@
                             <h3 class="dc-package-name">${pkg.name}</h3>
                             <div class="dc-package-price">${currency} ${price}</div>
                             
-                            <button class="dc-btn" id="pkg-btn-${pkg.id}" onclick="purchasePackage(${pkg.id})">
+                            <button class="dc-btn" id="pkg-btn-${pkg.id}" onclick="startPurchase(${pkg.id})">
                                 Acquire
                             </button>
                         </div>
@@ -558,74 +570,77 @@
             container.innerHTML = html;
         }
 
-        // 4. HANDLE CHECKOUT & REDIRECT
-        window.purchasePackage = async function(packageId) {
+        // 3. STEP ONE: CREATE BASKET & GET LOGIN LINK
+        window.startPurchase = async function(packageId) {
             const btn = document.getElementById(`pkg-btn-${packageId}`);
-            btn.innerText = "PROCESSING...";
+            btn.innerText = "CONNECTING...";
             btn.disabled = true;
 
             try {
-                // Step A: Create the empty basket (Uses /accounts/TOKEN/baskets)
+                // A: Create empty basket
                 const basketRes = await fetch(`${API_URL}/accounts/${TEBEX_TOKEN}/baskets`, {
                     method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json' 
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
                     body: JSON.stringify({
-                        complete_url: window.location.href, 
-                        cancel_url: window.location.href
+                        complete_url: window.location.href.split('?')[0], 
+                        cancel_url: window.location.href.split('?')[0]
                     })
                 });
-                
                 const basketData = await basketRes.json();
-                
-                if (!basketRes.ok || !basketData.data || !basketData.data.ident) {
-                    console.error("Tebex Basket Error:", basketData);
-                    throw new Error("Failed to create basket.");
-                }
-                
                 const basketIdent = basketData.data.ident;
 
-                // Step B: Add the package to the basket (THE FIX: Uses /baskets/IDENT/packages)
-                btn.innerText = "AUTHENTICATING...";
-                const addRes = await fetch(`${API_URL}/baskets/${basketIdent}/packages`, {
-                    method: 'POST',
-                    headers: { 
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json' 
-                    },
-                    body: JSON.stringify({ package_id: packageId, quantity: 1 })
-                });
+                // B: Ask Tebex for an authentication link for this specific basket
+                // We tell Tebex to send the user back to our website with the basket ID and package ID attached to the URL
+                const returnUrl = encodeURIComponent(`${window.location.href.split('?')[0]}?basket=${basketIdent}&package=${packageId}`);
+                const authRes = await fetch(`${API_URL}/accounts/${TEBEX_TOKEN}/baskets/${basketIdent}/auth?returnUrl=${returnUrl}`);
+                const authData = await authRes.json();
+
+                // C: Send them to Tebex to type their Minecraft Username!
+                btn.innerText = "AWAITING LOGIN...";
                 
-                const addData = await addRes.json();
-                
-                if (!addRes.ok) {
-                    console.error("Tebex Add Package Error:", addData);
-                    throw new Error("Failed to add package.");
+                // authData.data[0].url is usually the Minecraft login URL generated by Tebex
+                if(authData.data && authData.data.length > 0) {
+                     window.location.href = authData.data[0].url;
+                } else {
+                     throw new Error("No auth URL returned");
                 }
 
-                // Step C: Route directly to the checkout!
-                btn.innerText = "ROUTING...";
-                window.location.href = `https://checkout.tebex.io/checkout/${basketIdent}`;
-
             } catch (error) {
-                console.error("Checkout process failed:", error);
+                console.error("Auth process failed:", error);
                 btn.innerText = "SYSTEM ERROR";
-                btn.style.borderColor = "#ff3333";
                 btn.style.color = "#ff3333";
-                
-                setTimeout(() => { 
-                    btn.innerText = "Acquire"; 
-                    btn.disabled = false; 
-                    btn.style.borderColor = "#1f1f22";
-                    btn.style.color = "#ffffff";
-                }, 3000);
             }
         };
 
-        // Initialize Store on load
-        fetchStoreData();
+        // 4. STEP TWO: ADD ITEM & CHECKOUT (Runs after they come back from logging in)
+        async function finishCheckout(basketIdent, packageId) {
+            const loader = document.getElementById('store-loader');
+            loader.style.display = 'block';
+            loader.innerText = "AUTHENTICATION SUCCESSFUL. SECURING PACKAGE...";
+            
+            try {
+                // Add the package now that Tebex knows the username!
+                const addRes = await fetch(`${API_URL}/baskets/${basketIdent}/packages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+                    body: JSON.stringify({ package_id: packageId, quantity: 1 })
+                });
+
+                if (!addRes.ok) throw new Error("Failed to add package.");
+
+                // Send them to the final payment screen
+                loader.innerText = "ROUTING TO SECURE CHECKOUT...";
+                window.location.href = `https://checkout.tebex.io/checkout/${basketIdent}`;
+
+            } catch (error) {
+                console.error("Final checkout failed:", error);
+                loader.innerText = "ERROR ADDING PACKAGE. PLEASE TRY AGAIN.";
+                loader.style.color = "#ff3333";
+                
+                // Clear the URL so they can try again
+                setTimeout(() => { window.location.href = window.location.href.split('?')[0]; }, 3000);
+            }
+        }
     });
 </script>
 
