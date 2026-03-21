@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -298,6 +299,112 @@
             .about-card { padding: 60px 30px; }
             .about-stats-row { gap: 40px; }
         }
+        /* --- DROWSYCRAFT STORE MODULE CSS --- */
+.store-container {
+    max-width: 1200px;
+    margin: 80px auto;
+    padding: 0 5%;
+    font-family: 'Montserrat', sans-serif;
+}
+
+#store-loader {
+    text-align: center;
+    padding: 50px 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 4px;
+    color: #88888e;
+    text-transform: uppercase;
+    animation: dc-pulse 2s infinite;
+}
+
+@keyframes dc-pulse {
+    0% { opacity: 0.5; }
+    50% { opacity: 1; }
+    100% { opacity: 0.5; }
+}
+
+.dc-category-section {
+    margin-bottom: 80px;
+}
+
+.dc-category-header {
+    border-bottom: 1px solid #1f1f22;
+    padding-bottom: 15px;
+    margin-bottom: 40px;
+}
+
+.dc-category-header h2 {
+    font-size: 1.5rem;
+    letter-spacing: 3px;
+    color: #ffffff;
+    text-transform: uppercase;
+    font-weight: 900;
+    margin: 0;
+}
+
+.dc-package-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.dc-package-card {
+    background-color: #0a0a0c;
+    border: 1px solid #1f1f22;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.4s ease;
+}
+
+.dc-package-card:hover {
+    border-color: #ffffff;
+    transform: translateY(-5px);
+}
+
+.dc-package-name {
+    font-size: 1.2rem;
+    letter-spacing: 1px;
+    color: #ffffff;
+    font-weight: 800;
+    text-transform: uppercase;
+    margin: 0 0 10px 0;
+}
+
+.dc-package-price {
+    font-size: 1.5rem;
+    color: #88888e;
+    margin-bottom: 30px;
+    font-weight: 300;
+}
+
+.dc-btn {
+    background-color: transparent;
+    color: #ffffff;
+    border: 1px solid #1f1f22;
+    padding: 15px;
+    text-align: center;
+    font-weight: 800;
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: auto;
+    cursor: pointer;
+    transition: all 0.3s;
+    width: 100%;
+}
+
+.dc-btn:hover {
+    background-color: #ffffff;
+    color: #030303;
+    border-color: #ffffff;
+}
+
+.dc-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
     </style>
 </head>
 <body>
@@ -361,6 +468,11 @@
         </div>
     </section>
 
+    <div id="drowsy-store-module" class="store-container">
+        <div id="store-loader">SYNCING ECOSYSTEM DATA...</div>
+        <div id="store-content"></div>
+    </div>
+
     <footer class="footer-stats">
         <div class="frontier-call">The Drowsy Frontier is Calling</div>
         <div class="sub-text">Early Access Phase Coming Soon..</div>
@@ -382,6 +494,120 @@
             }, 2000);
         }
     </script>
+    <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        
+        // 1. SET YOUR TEBEX PUBLIC TOKEN HERE
+        const TEBEX_TOKEN = "1299r-1d1d2bfd59d894301fc64d0fee5cbd2ee94c7119"; 
+        const BASE_URL = `https://headless.tebex.io/api/accounts/${TEBEX_TOKEN}`;
+
+        // 2. FETCH STORE DATA
+        async function fetchStoreData() {
+            try {
+                const response = await fetch(`${BASE_URL}/categories?includePackages=1`);
+                if (!response.ok) throw new Error("Network response was not ok");
+                const json = await response.json();
+                
+                document.getElementById('store-loader').style.display = 'none';
+                renderStore(json.data);
+            } catch (error) {
+                console.error("Failed to load store:", error);
+                const loader = document.getElementById('store-loader');
+                loader.innerText = "SYSTEM ERROR: FAILED TO CONNECT TO ECOSYSTEM.";
+                loader.style.color = "#ff3333";
+                loader.style.animation = "none";
+            }
+        }
+
+        // 3. RENDER THE STORE IN YOUR EXISTING DIV
+        function renderStore(categories) {
+            const container = document.getElementById('store-content');
+            
+            categories.forEach(category => {
+                if (!category.packages || category.packages.length === 0) return;
+
+                const section = document.createElement('div');
+                section.className = 'dc-category-section';
+                
+                let html = `
+                    <div class="dc-category-header">
+                        <h2>${category.name}</h2>
+                    </div>
+                    <div class="dc-package-grid">
+                `;
+
+                category.packages.forEach(pkg => {
+                    const price = pkg.total_price.toFixed(2);
+                    const currency = pkg.currency;
+
+                    html += `
+                        <div class="dc-package-card">
+                            <h3 class="dc-package-name">${pkg.name}</h3>
+                            <div class="dc-package-price">${currency} ${price}</div>
+                            
+                            <button class="dc-btn" id="pkg-btn-${pkg.id}" onclick="purchasePackage(${pkg.id})">
+                                Acquire
+                            </button>
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                section.innerHTML = html;
+                container.appendChild(section);
+            });
+        }
+
+        // 4. HANDLE CHECKOUT & REDIRECT
+        window.purchasePackage = async function(packageId) {
+            const btn = document.getElementById(`pkg-btn-${packageId}`);
+            btn.innerText = "PROCESSING...";
+            btn.disabled = true;
+
+            try {
+                // Create Basket
+                const basketRes = await fetch(`${BASE_URL}/baskets`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        complete_url: window.location.href, 
+                        cancel_url: window.location.href    
+                    })
+                });
+                const basketData = await basketRes.json();
+                const basketIdent = basketData.data.ident;
+
+                // Add Item
+                btn.innerText = "AUTHENTICATING...";
+                await fetch(`${BASE_URL}/baskets/${basketIdent}/packages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ package_id: packageId, quantity: 1 })
+                });
+
+                // Redirect to Secure Tebex Checkout
+                btn.innerText = "ROUTING...";
+                window.location.href = basketData.data.links.checkout;
+
+            } catch (error) {
+                console.error("Checkout failed:", error);
+                btn.innerText = "SYSTEM ERROR";
+                btn.style.borderColor = "#ff3333";
+                btn.style.color = "#ff3333";
+                
+                setTimeout(() => { 
+                    btn.innerText = "Acquire"; 
+                    btn.disabled = false; 
+                    btn.style.borderColor = "#1f1f22";
+                    btn.style.color = "#ffffff";
+                }, 3000);
+            }
+        };
+
+        // Initialize Store on load
+        fetchStoreData();
+    });
+</script>
 
 </body>
 </html>
