@@ -498,13 +498,14 @@
     document.addEventListener("DOMContentLoaded", () => {
         
         // 1. SET YOUR TEBEX PUBLIC TOKEN HERE
-        const TEBEX_TOKEN = "1299r-1d1d2bfd59d894301fc64d0fee5cbd2ee94c7119"; 
-        const BASE_URL = `https://headless.tebex.io/api/accounts/${TEBEX_TOKEN}`;
+        const TEBEX_TOKEN = "1299r-1d1d2bfd59d894301fc64d0fee5cbd2ee94c7119"; // I pulled this from your error log!
+        
+        const API_URL = "https://headless.tebex.io/api";
 
         // 2. FETCH STORE DATA
         async function fetchStoreData() {
             try {
-                const response = await fetch(`${BASE_URL}/categories?includePackages=1`);
+                const response = await fetch(`${API_URL}/accounts/${TEBEX_TOKEN}/categories?includePackages=1`);
                 if (!response.ok) throw new Error("Network response was not ok");
                 const json = await response.json();
                 
@@ -519,7 +520,7 @@
             }
         }
 
-        // 3. RENDER THE STORE (Removed the manual username input for a cleaner UI)
+        // 3. RENDER THE STORE
         function renderStore(categories) {
             const container = document.getElementById('store-content');
             let html = ``;
@@ -564,8 +565,8 @@
             btn.disabled = true;
 
             try {
-                // Step A: Create the empty basket (Tebex will ask for the username at checkout)
-                const basketRes = await fetch(`${BASE_URL}/baskets`, {
+                // Step A: Create the empty basket (Uses /accounts/TOKEN/baskets)
+                const basketRes = await fetch(`${API_URL}/accounts/${TEBEX_TOKEN}/baskets`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -579,7 +580,6 @@
                 
                 const basketData = await basketRes.json();
                 
-                // Detailed error checking
                 if (!basketRes.ok || !basketData.data || !basketData.data.ident) {
                     console.error("Tebex Basket Error:", basketData);
                     throw new Error("Failed to create basket.");
@@ -587,9 +587,9 @@
                 
                 const basketIdent = basketData.data.ident;
 
-                // Step B: Add the package to the basket
+                // Step B: Add the package to the basket (THE FIX: Uses /baskets/IDENT/packages)
                 btn.innerText = "AUTHENTICATING...";
-                const addRes = await fetch(`${BASE_URL}/baskets/${basketIdent}/packages`, {
+                const addRes = await fetch(`${API_URL}/baskets/${basketIdent}/packages`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
@@ -605,8 +605,7 @@
                     throw new Error("Failed to add package.");
                 }
 
-                // Step C: Route directly to the checkout ident URL!
-                // This guarantees we don't get the 'undefined' error.
+                // Step C: Route directly to the checkout!
                 btn.innerText = "ROUTING...";
                 window.location.href = `https://checkout.tebex.io/checkout/${basketIdent}`;
 
