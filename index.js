@@ -1,5 +1,5 @@
 require('dotenv').config();
-const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, REST, Routes, SlashCommandBuilder, PermissionFlagsBits } = require('discord.js');
+const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, REST, Routes, SlashCommandBuilder } = require('discord.js');
 
 const client = new Client({ 
     intents: [
@@ -15,6 +15,16 @@ const CLIENT_ID = process.env.CLIENT_ID;
 const GUILD_ID = process.env.GUILD_ID;
 
 const channelData = new Map();
+
+// --- CUSTOM PERMISSION CHECK ---
+function isAdmin(member) {
+    // 1. Check if they are the Server Owner
+    if (member.guild.ownerId === member.id) return true;
+
+    // 2. Check for specific Role Names (Case-Sensitive)
+    const allowedRoles = ['Squires','Guards', 'Knights', 'Drowsy Defender', 'God'];
+    return member.roles.cache.some(role => allowedRoles.includes(role.name));
+}
 
 function getChannelData(channelId) {
     if (!channelData.has(channelId)) {
@@ -48,74 +58,64 @@ function createButtonRow() {
     );
 }
 
-// --- Admin Restricted Commands ---
+// Note: We remove setDefaultMemberPermissions so the commands show up, but we block them in the code below
 const commands = [
-    new SlashCommandBuilder()
-        .setName('start-queue')
-        .setDescription('Admin only: Start a separate queue in this channel')
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
-    new SlashCommandBuilder()
-        .setName('stop-queue')
-        .setDescription('Admin only: Delete the queue and stop event in this channel')
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels),
-    new SlashCommandBuilder()
-        .setName('queue')
-        .setDescription('Repost the queue at the bottom of this channel'),
-    new SlashCommandBuilder()
-        .setName('next')
-        .setDescription('Admin only: Move the highlight to the next person')
-        .setDefaultMemberPermissions(PermissionFlagsBits.ManageChannels)
+    new SlashCommandBuilder().setName('start-queue').setDescription('Start the event queue (Restricted Roles)'),
+    new SlashCommandBuilder().setName('stop-queue').setDescription('Stop the event and delete queue (Restricted Roles)'),
+    new SlashCommandBuilder().setName('queue').setDescription('Repost the queue at the bottom'),
+    new SlashCommandBuilder().setName('next').setDescription('Move to the next speaker (Restricted Roles)')
 ].map(command => command.toJSON());
 
 client.once('clientReady', async () => {
-    console.log(`🎙️ Drowsy Vocals Admin-Controlled Mode is online!`);
+    console.log(`🎙️ Drowsy Vocals (Role-Restricted) is online!`);
     const rest = new REST({ version: '10' }).setToken(BOT_TOKEN);
     try {
         await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), { body: commands });
-        console.log('✅ Admin commands registered!');
+        console.log('✅ Commands registered!');
     } catch (e) { console.error(e); }
 });
 
 async function refreshPopup(channel) {
     const data = getChannelData(channel.id);
-
     if (data.lastMessageId) {
         try {
             const oldMsg = await channel.messages.fetch(data.lastMessageId);
             if (oldMsg) await oldMsg.delete();
-        } catch (e) { /* Already deleted */ }
+        } catch (e) {}
     }
-
-    const newMsg = await channel.send({ 
-        embeds: [createQueueEmbed(data)], 
-        components: [createButtonRow()] 
-    });
+    const newMsg = await channel.send({ embeds: [createQueueEmbed(data)], components: [createButtonRow()] });
     data.lastMessageId = newMsg.id;
 }
 
 client.on('interactionCreate', async interaction => {
     if (!interaction.guild) return;
     const data = getChannelData(interaction.channelId);
+    const member = await interaction.guild.members.fetch(interaction.user.id);
 
     if (interaction.isChatInputCommand()) {
         const { commandName } = interaction;
 
+        // Block non-admins from sensitive commands
+        if (['start-queue', 'stop-queue', 'next'].includes(commandName)) {
+            if (!isAdmin(member)) {
+                return interaction.reply({ content: "❌ You don't have the required role (Guards, Knights, Defenders, or Gods) to use this.", ephemeral: true });
+            }
+        }
+
         if (commandName === 'start-queue' || commandName === 'queue') {
-            await interaction.reply({ content: "Refreshing channel queue...", ephemeral: true });
+            await interaction.reply({ content: "Refreshing queue...", ephemeral: true });
             await refreshPopup(interaction.channel);
         }
 
         if (commandName === 'stop-queue') {
-            // Delete the last message if it exists
             if (data.lastMessageId) {
                 try {
                     const oldMsg = await interaction.channel.messages.fetch(data.lastMessageId);
                     if (oldMsg) await oldMsg.delete();
                 } catch (e) {}
             }
-            // Remove the channel data entirely
             channelData.delete(interaction.channelId);
-            await interaction.reply({ content: "🏁 The event in this channel has been stopped and the queue deleted.", ephemeral: false });
+            await interaction.reply({ content: "🏁 Event stopped and queue cleared." });
         }
 
         if (commandName === 'next') {
@@ -126,8 +126,6 @@ client.on('interactionCreate', async interaction => {
     }
 
     if (interaction.isButton()) {
-        const member = await interaction.guild.members.fetch(interaction.user.id);
-
         if (interaction.customId === 'join') {
             if (!member.voice.channel) return interaction.reply({ content: "❌ Join the VC first!", ephemeral: true });
             if (data.queue.includes(interaction.user.id)) return interaction.reply({ content: "Already in line!", ephemeral: true });
