@@ -28,6 +28,7 @@
 
         html {
             scroll-behavior: smooth;
+            scroll-padding-top: 80px;
         }
 
         body {
@@ -37,6 +38,43 @@
             overflow-x: hidden;
             overflow-y: auto; 
             line-height: 1.6;
+        }
+
+        /* --- NAVIGATION BAR --- */
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            padding: 25px 20px;
+            z-index: 1000;
+            background: rgba(6, 7, 9, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 40px;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: var(--text-main);
+            text-decoration: none;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 0.85rem;
+            transition: color 0.3s ease, text-shadow 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent-blue);
+            text-shadow: 0 0 15px var(--accent-glow);
         }
 
         /* --- HERO SECTION (Screen 1) --- */
@@ -347,14 +385,22 @@
 </head>
 <body>
 
-    <div class="hero-section">
+    <nav class="navbar">
+        <ul class="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="#drowsy-store-module">Store</a></li>
+        </ul>
+    </nav>
+
+    <div id="home" class="hero-section">
         <div class="est-tag">EST. 2026</div>
 
         <div class="logo-container">
             <span class="logo-white">DROWSY</span><span class="logo-blue">CRAFT</span>
         </div>
 
-        <div class="motto">The Drowsy Frontier is Calling.</div>
+        <div class="motto">.gg/drowsyvocals</div>
 
         <div class="action-area">
             <div class="ip-box" id="ipBox" onclick="copyIP()">
@@ -420,15 +466,12 @@
     </div>
 
     <footer class="footer-stats">
-        <div class="frontier-call">The Drowsy Frontier is Calling</div>
+        <div class="frontier-call">.gg/drowsyvocals</div>
         <div class="sub-text">Early Access Phase Coming Soon..</div>
         <div class="sub-text">&copy; 2026 Drowsy Vocals | ABZ Digital Group</div>
     </footer>
 
-Here is the fully synchronized, updated code. I have fixed the ID mismatch that was causing your "null" error and ensured the Architect Pack style and 1000 Coin descriptions we discussed are fully supported.
 
-The Final "DrowsyCraft" Store Module
-HTML
 <div id="drowsy-store-module" class="dc-store-wrap">
     
     <div class="dc-terminal">
