@@ -1,4 +1,4 @@
-require('dotenv').config();
+
 const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, REST, Routes, SlashCommandBuilder } = require('discord.js');
 
 const client = new Client({ 
