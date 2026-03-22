@@ -6,7 +6,7 @@ const client = new Client({
         GatewayIntentBits.Guilds, 
         GatewayIntentBits.GuildMessages, 
         GatewayIntentBits.GuildVoiceStates, 
-        GatewayIntentBits.GuildMembers 
+        GatewayIntentBits.GuildMembers // ENSURE THIS IS ON IN DEV PORTAL
     ] 
 });
 
@@ -18,21 +18,14 @@ const channelData = new Map();
 
 // --- CUSTOM PERMISSION CHECK ---
 function isAdmin(member) {
-    // 1. Check if they are the Server Owner
     if (member.guild.ownerId === member.id) return true;
-
-    // 2. Check for specific Role Names (Case-Sensitive)
-    const allowedRoles = ['Squires','Guards', 'Knights', 'Drowsy Defender', 'God'];
+    const allowedRoles = ['Guards', 'Knights', 'Drowsy Defenders', 'God'];
     return member.roles.cache.some(role => allowedRoles.includes(role.name));
 }
 
 function getChannelData(channelId) {
     if (!channelData.has(channelId)) {
-        channelData.set(channelId, {
-            queue: [],
-            currentSpeaker: null,
-            lastMessageId: null
-        });
+        channelData.set(channelId, { queue: [], currentSpeaker: null, lastMessageId: null });
     }
     return channelData.get(channelId);
 }
@@ -46,8 +39,7 @@ function createQueueEmbed(data) {
         .setTitle("💤 Drowsy Speaker Queue")
         .setDescription(`**Currently on the Mic:** ${data.currentSpeaker ? `<@${data.currentSpeaker}>` : "Open Mic"}\n\n**Up Next:**\n${list}`)
         .setColor(0x5865F2)
-        .setFooter({ text: "Join the line to get your turn! Must be in VC." })
-        .setTimestamp();
+        .setFooter({ text: "Join the line to get your turn! Must be in VC." });
 }
 
 function createButtonRow() {
@@ -58,20 +50,18 @@ function createButtonRow() {
     );
 }
 
-// Note: We remove setDefaultMemberPermissions so the commands show up, but we block them in the code below
 const commands = [
-    new SlashCommandBuilder().setName('start-queue').setDescription('Start the event queue (Restricted Roles)'),
-    new SlashCommandBuilder().setName('stop-queue').setDescription('Stop the event and delete queue (Restricted Roles)'),
+    new SlashCommandBuilder().setName('start-queue').setDescription('Start the event queue (Staff Only)'),
+    new SlashCommandBuilder().setName('stop-queue').setDescription('Stop the event (Staff Only)'),
     new SlashCommandBuilder().setName('queue').setDescription('Repost the queue at the bottom'),
-    new SlashCommandBuilder().setName('next').setDescription('Move to the next speaker (Restricted Roles)')
+    new SlashCommandBuilder().setName('next').setDescription('Move to next speaker (Staff Only)')
 ].map(command => command.toJSON());
 
 client.once('clientReady', async () => {
-    console.log(`🎙️ Drowsy Vocals (Role-Restricted) is online!`);
+    console.log(`🎙️ Drowsy Vocals is online!`);
     const rest = new REST({ version: '10' }).setToken(BOT_TOKEN);
     try {
         await rest.put(Routes.applicationGuildCommands(CLIENT_ID, GUILD_ID), { body: commands });
-        console.log('✅ Commands registered!');
     } catch (e) { console.error(e); }
 });
 
@@ -95,16 +85,19 @@ client.on('interactionCreate', async interaction => {
     if (interaction.isChatInputCommand()) {
         const { commandName } = interaction;
 
-        // Block non-admins from sensitive commands
+        // Staff-only check
         if (['start-queue', 'stop-queue', 'next'].includes(commandName)) {
             if (!isAdmin(member)) {
-                return interaction.reply({ content: "❌ You don't have the required role (Guards, Knights, Defenders, or Gods) to use this.", ephemeral: true });
+                return interaction.reply({ content: "❌ Restricted to Guards, Knights, Defenders, or Gods.", ephemeral: true });
             }
         }
 
+        // Use deferReply to prevent "Application did not respond"
+        await interaction.deferReply({ ephemeral: true });
+
         if (commandName === 'start-queue' || commandName === 'queue') {
-            await interaction.reply({ content: "Refreshing queue...", ephemeral: true });
             await refreshPopup(interaction.channel);
+            await interaction.editReply({ content: "Queue refreshed at bottom!" });
         }
 
         if (commandName === 'stop-queue') {
@@ -115,13 +108,13 @@ client.on('interactionCreate', async interaction => {
                 } catch (e) {}
             }
             channelData.delete(interaction.channelId);
-            await interaction.reply({ content: "🏁 Event stopped and queue cleared." });
+            await interaction.editReply({ content: "🏁 Event stopped." });
         }
 
         if (commandName === 'next') {
             await handleNextSpeaker(interaction.channel, data);
-            await interaction.reply({ content: "Highlight moved.", ephemeral: true });
             await refreshPopup(interaction.channel);
+            await interaction.editReply({ content: "Moved to next speaker!" });
         }
     }
 
@@ -143,7 +136,7 @@ client.on('interactionCreate', async interaction => {
 
         if (interaction.customId === 'finished') {
             if (interaction.user.id !== data.currentSpeaker) {
-                return interaction.reply({ content: "It's not your turn yet!", ephemeral: true });
+                return interaction.reply({ content: "Not your turn!", ephemeral: true });
             }
             await handleNextSpeaker(interaction.channel, data);
         }
