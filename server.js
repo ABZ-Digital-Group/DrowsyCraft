@@ -23,3 +23,6 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`🚀 DrowsyCraft Web Panel running on port ${PORT}`);
 });
+
+// --- START DISCORD BOT ---
+require('./index.js');
