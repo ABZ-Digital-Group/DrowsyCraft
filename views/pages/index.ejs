@@ -425,6 +425,81 @@
         <div class="sub-text">&copy; 2026 Drowsy Vocals | ABZ Digital Group</div>
     </footer>
 
+Here is the fully synchronized, updated code. I have fixed the ID mismatch that was causing your "null" error and ensured the Architect Pack style and 1000 Coin descriptions we discussed are fully supported.
+
+The Final "DrowsyCraft" Store Module
+HTML
+<div id="drowsy-store-module" class="dc-store-wrap">
+    
+    <div class="dc-terminal">
+        <div class="dc-badge">SECURE TERMINAL // EST. 2026</div>
+        <h2 class="dc-terminal-title">Identify Player</h2>
+        <div class="dc-input-container">
+            <input type="text" id="dc-username" placeholder="ENTER MINECRAFT USERNAME" autocomplete="off">
+            <div class="dc-input-glow"></div>
+        </div>
+    </div>
+
+    <div id="store-loader" class="dc-loader">SYNCING_ECOSYSTEM_DATA...</div>
+    
+    <div id="store-content"></div>
+</div>
+
+<style>
+    .dc-store-wrap { max-width: 1200px; margin: 80px auto; padding: 0 20px; font-family: 'Montserrat', sans-serif; color: #ffffff; }
+    
+    /* Terminal UI */
+    .dc-terminal { text-align: center; margin-bottom: 80px; }
+    .dc-badge { display: inline-block; border: 1px solid #1a1a1c; padding: 5px 15px; font-size: 10px; letter-spacing: 4px; color: #55555a; margin-bottom: 20px; text-transform: uppercase; font-weight: 700; }
+    .dc-terminal-title { font-weight: 900; text-transform: uppercase; letter-spacing: 6px; font-size: 1.4rem; margin-bottom: 30px; }
+    
+    #dc-username { 
+        background: transparent; border: none; border-bottom: 1px solid #1a1a1c; 
+        color: #ffffff; width: 100%; max-width: 350px; padding: 15px 0; 
+        text-align: center; font-size: 1.1rem; letter-spacing: 3px; outline: none; 
+        text-transform: uppercase; transition: all 0.4s ease; 
+    }
+    #dc-username:focus { border-bottom-color: #ffffff; }
+
+    /* Grid & Cards */
+    .dc-loader { text-align: center; letter-spacing: 5px; color: #2a2a2c; padding: 50px; font-weight: 900; }
+    .dc-cat-section { margin-bottom: 100px; }
+    .dc-cat-header h2 { font-weight: 900; text-transform: uppercase; letter-spacing: 4px; font-size: 1.2rem; border-bottom: 1px solid #111; padding-bottom: 15px; margin-bottom: 40px; }
+    
+    .dc-package-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+    
+    .dc-package-card { 
+        background: #050505; border: 1px solid #111113; padding: 40px; 
+        display: flex; flex-direction: column; transition: all 0.4s ease; position: relative;
+    }
+    .dc-package-card:hover { border-color: #ffffff; background: #08080a; transform: translateY(-5px); }
+
+    .dc-pkg-name { font-weight: 900; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 10px; font-size: 1.2rem; }
+    .dc-pkg-price { color: #88888e; font-weight: 300; font-size: 1.4rem; margin-bottom: 25px; }
+
+    /* Description / Included Items */
+    .dc-pkg-desc { color: #666; font-size: 0.85rem; line-height: 1.7; margin-bottom: 35px; flex-grow: 1; border-top: 1px solid #111; padding-top: 20px; }
+    .dc-pkg-desc ul { list-style: none; padding: 0; }
+    .dc-pkg-desc li { margin-bottom: 10px; padding-left: 15px; position: relative; }
+    .dc-pkg-desc li::before { content: ""; position: absolute; left: 0; top: 9px; width: 5px; height: 1px; background: #444; }
+
+    /* Fixed Button Styling */
+    .dc-acquire-btn {
+        background: transparent !important; border: 1px solid #222 !important;
+        color: #ffffff !important; padding: 16px !important;
+        font-weight: 900 !important; font-size: 10px !important;
+        letter-spacing: 3px !important; text-transform: uppercase !important;
+        cursor: pointer !important; transition: all 0.3s ease !important;
+        width: 100% !important; border-radius: 0 !important;
+    }
+    .dc-acquire-btn:hover { background: #ffffff !important; color: #000000 !important; border-color: #ffffff !important; }
+
+    /* Limited Edition Pulse */
+    .dc-limited { border-color: rgba(255, 0, 0, 0.2) !important; }
+    .dc-limited .dc-pkg-price { color: #ff3333 !important; animation: dc-pulse 2s infinite; }
+    @keyframes dc-pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+</style>
+
 <script>
 document.addEventListener("DOMContentLoaded", () => {
     const TEBEX_TOKEN = "1299r-1d1d2bfd59d894301fc64d0fee5cbd2ee94c7119"; 
@@ -438,23 +513,35 @@ document.addEventListener("DOMContentLoaded", () => {
             const json = await res.json();
             document.getElementById('store-loader').style.display = 'none';
             renderStore(json.data);
-        } catch (e) { document.getElementById('store-loader').innerText = "SYSTEM OFFLINE"; }
+        } catch (e) { 
+            console.error(e);
+            document.getElementById('store-loader').innerText = "SYSTEM_OFFLINE"; 
+        }
     }
 
     function renderStore(categories) {
         const container = document.getElementById('store-content');
         let html = '';
+        
         categories.forEach(cat => {
-            if (!cat.packages.length) return;
-            html += `<div class="dc-category-wrap"><div class="dc-cat-header"><h2>${cat.name}</h2></div><div class="dc-package-grid">`;
+            if (!cat.packages || !cat.packages.length) return;
+            
+            html += `
+                <div class="dc-cat-section">
+                    <div class="dc-cat-header"><h2>${cat.name}</h2></div>
+                    <div class="dc-package-grid">
+            `;
+
             cat.packages.forEach(pkg => {
-                // We inject the description here
+                const isLimited = pkg.name.toUpperCase().includes("LIMITED");
+                const cardClass = isLimited ? "dc-package-card dc-limited" : "dc-package-card";
+
                 html += `
-                    <div class="dc-package-card">
+                    <div class="${cardClass}">
                         <h3 class="dc-pkg-name">${pkg.name}</h3>
                         <div class="dc-pkg-price">${pkg.currency} ${pkg.total_price.toFixed(2)}</div>
                         <div class="dc-pkg-desc">${pkg.description}</div>
-                        <button class="dc-acquire-btn" id="btn-${pkg.id}" onclick="handlePurchase(${pkg.id})">Acquire</button>
+                        <button class="dc-acquire-btn" id="pkg-btn-${pkg.id}" onclick="handlePurchase(${pkg.id})">Acquire</button>
                     </div>`;
             });
             html += `</div></div>`;
@@ -463,10 +550,19 @@ document.addEventListener("DOMContentLoaded", () => {
     }
 
     window.handlePurchase = async function(packageId) {
-        const user = document.getElementById('dc-username').value.trim();
+        const userField = document.getElementById('dc-username');
+        const user = userField.value.trim();
+        
+        // THE FIX: Target the exact ID generated in renderStore
         const btn = document.getElementById(`pkg-btn-${packageId}`);
-        if (!user) { document.getElementById('dc-username').focus(); return; }
+        
+        if (!user) {
+            userField.focus();
+            userField.style.borderBottomColor = "#ff3333";
+            return;
+        }
 
+        const originalText = btn.innerText;
         btn.innerText = "AUTHENTICATING...";
         btn.disabled = true;
         
@@ -474,7 +570,11 @@ document.addEventListener("DOMContentLoaded", () => {
             const bRes = await fetch(`${API_URL}/accounts/${TEBEX_TOKEN}/baskets`, {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({ username: user, complete_url: window.location.href, cancel_url: window.location.href })
+                body: JSON.stringify({
+                    username: user,
+                    complete_url: window.location.href,
+                    cancel_url: window.location.href
+                })
             });
             const bData = await bRes.json();
             const ident = bData.data.ident;
@@ -486,9 +586,11 @@ document.addEventListener("DOMContentLoaded", () => {
             });
 
             window.location.href = `https://checkout.tebex.io/checkout/${ident}`;
+
         } catch (e) { 
-            btn.innerText = "ERROR";
-            btn.disabled = false;
+            console.error(e);
+            btn.innerText = "GATEWAY_ERROR";
+            setTimeout(() => { btn.innerText = originalText; btn.disabled = false; }, 2000);
         }
     };
 });
