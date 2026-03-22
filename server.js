@@ -19,10 +19,13 @@ app.get('/', (req, res) => {
     res.render('pages/index'); 
 });
 
-// --- START SERVER ---
-app.listen(PORT, () => {
-    console.log(`🚀 DrowsyCraft Web Panel running on port ${PORT}`);
-});
+app.listen(PORT, () => console.log(`🚀 DrowsyCraft Web Panel running on port ${PORT}`));
 
-// --- START DISCORD BOT ---
-require('./index.js');
+(async () => {
+ try {
+ if (!process.env.DISCORD_TOKEN) return console.log('DISCORD_TOKEN not set; bot not started');
+ require('./index.js');
+ } catch (e) {
+ console.error('Bot failed to start:', e);
+ }
+})();
