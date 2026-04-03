@@ -1,10 +1,20 @@
-const { Client, GatewayIntentBits, ActionRowBuilder, ButtonBuilder, ButtonStyle, EmbedBuilder, REST, Routes, SlashCommandBuilder } = require('discord.js');
+const { 
+    Client, 
+    GatewayIntentBits, 
+    ActionRowBuilder, 
+    ButtonBuilder, 
+    ButtonStyle, 
+    EmbedBuilder, 
+    REST, 
+    Routes, 
+    SlashCommandBuilder 
+} = require('discord.js');
 
 const client = new Client({ 
     intents: [
         GatewayIntentBits.Guilds, 
         GatewayIntentBits.GuildMessages, 
-        GatewayIntentBits.MessageContent,
+        GatewayIntentBits.MessageContent, 
         GatewayIntentBits.GuildVoiceStates, 
         GatewayIntentBits.GuildMembers 
     ] 
@@ -14,14 +24,14 @@ const BOT_TOKEN = process.env.DISCORD_TOKEN;
 const CLIENT_ID = process.env.CLIENT_ID;
 const GUILD_ID = process.env.GUILD_ID;
 
+// --- CONFIGURATION ---
+const MAX_HYPE = 100;
+const DECAY_RATE = 3; 
+const UPDATE_INTERVAL = 4000; 
+
 const channelData = new Map();
 
-// --- HYPE SETTINGS ---
-const MAX_HYPE = 100;
-const DECAY_RATE = 3; // Drops by 3 every 4 seconds
-const UPDATE_INTERVAL = 4000; // 4 seconds (safe for rate limits)
-
-// --- CUSTOM PERMISSION CHECK ---
+// --- PERMISSION CHECK ---
 function isAdmin(member) {
     if (member.guild.ownerId === member.id) return true;
     const allowedRoles = ['Guards', 'Knights', 'Drowsy Defenders', 'God'];
@@ -34,12 +44,13 @@ function getChannelData(channelId) {
             queue: [], 
             currentSpeaker: null, 
             lastMessageId: null,
-            activeHypeCollector: null // Track collector to stop it later
+            activeHypeCollector: null 
         });
     }
     return channelData.get(channelId);
 }
 
+// --- EMBED BUILDERS ---
 function createQueueEmbed(data) {
     const list = data.queue.length > 0 
         ? data.queue.map((id, i) => `**${i + 1}.** <@${id}>`).join('\n') 
@@ -60,6 +71,7 @@ function createButtonRow() {
     );
 }
 
+// --- SLASH COMMANDS ---
 const commands = [
     new SlashCommandBuilder().setName('start-queue').setDescription('Start the event queue (Staff Only)'),
     new SlashCommandBuilder().setName('stop-queue').setDescription('Stop the event (Staff Only)'),
@@ -75,6 +87,7 @@ client.once('ready', async () => {
     } catch (e) { console.error(e); }
 });
 
+// --- CORE FUNCTIONS ---
 async function refreshPopup(channel) {
     const data = getChannelData(channel.id);
     if (data.lastMessageId) {
@@ -87,21 +100,20 @@ async function refreshPopup(channel) {
     data.lastMessageId = newMsg.id;
 }
 
-// --- NEW: HYPE SESSION LOGIC ---
 async function startHypeSession(channel, data) {
-    // Stop any existing collector/meter from previous singer
     if (data.activeHypeCollector) data.activeHypeCollector.stop();
 
-    let currentHype = 25; 
+    let currentHype = 30; 
     const speakerId = data.currentSpeaker;
 
     const getHypeEmbed = (hype) => {
         const progress = Math.round((hype / MAX_HYPE) * 10);
         const bar = "🟦".repeat(progress) + "⬛".repeat(10 - progress);
         return new EmbedBuilder()
-            .setTitle(`🎶 NOW PERFORMING: <@${speakerId}>`)
-            .setDescription(`**Hype Meter:**\n${bar} **${hype}%**\n\n*Click to cheer!*`)
-            .setColor(hype > 80 ? 0xFEE75C : 0x5865F2);
+            .setTitle(`🎶 NOW ON STAGE:`)
+            .setDescription(`## <@${speakerId}>\n\n**Hype Meter:**\n${bar} **${hype}%**\n\n*Audience: Smash the buttons to cheer!*`)
+            .setColor(hype > 80 ? 0xFEE75C : 0x5865F2)
+            .setTimestamp();
     };
 
     const hypeRow = new ActionRowBuilder().addComponents(
@@ -110,9 +122,13 @@ async function startHypeSession(channel, data) {
         new ButtonBuilder().setCustomId(`hype_3`).setLabel('👑').setStyle(ButtonStyle.Secondary)
     );
 
-    const hypeMsg = await channel.send({ embeds: [getHypeEmbed(currentHype)], components: [hypeRow] });
+    const hypeMsg = await channel.send({ 
+        content: `🎙️ **Attention! <@${speakerId}> has the mic!**`,
+        embeds: [getHypeEmbed(currentHype)], 
+        components: [hypeRow] 
+    });
 
-    const collector = hypeMsg.createMessageComponentCollector({ time: 600000 }); // 10 min max
+    const collector = hypeMsg.createMessageComponentCollector({ time: 600000 });
     data.activeHypeCollector = collector;
 
     const refreshLoop = setInterval(async () => {
@@ -129,21 +145,20 @@ async function startHypeSession(channel, data) {
 
     collector.on('collect', async i => {
         if (i.customId.startsWith('hype_')) {
-            currentHype = Math.min(currentHype + 6, MAX_HYPE);
+            currentHype = Math.min(currentHype + 8, MAX_HYPE);
             await i.deferUpdate();
         }
     });
 
     collector.on('end', () => {
         clearInterval(refreshLoop);
-        hypeMsg.edit({ content: `✅ Set complete for <@${speakerId}>!`, components: [] }).catch(() => {});
+        hypeMsg.edit({ content: `✅ **Set complete for <@${speakerId}>!**`, components: [] }).catch(() => {});
     });
 }
 
 async function handleNextSpeaker(channel, data) {
     if (data.queue.length > 0) {
         data.currentSpeaker = data.queue.shift();
-        // Start the Hype Meter for the new singer
         await startHypeSession(channel, data);
     } else {
         if (data.activeHypeCollector) data.activeHypeCollector.stop();
@@ -152,10 +167,11 @@ async function handleNextSpeaker(channel, data) {
     }
 }
 
+// --- INTERACTION HANDLER ---
 client.on('interactionCreate', async interaction => {
     if (!interaction.guild) return;
     
-    // Ignore Hype button interactions in this main listener (they are handled by their own collector)
+    // Ignore Hype buttons (handled by localized collector)
     if (interaction.isButton() && interaction.customId.startsWith('hype_')) return;
 
     const data = getChannelData(interaction.channelId);
@@ -165,9 +181,7 @@ client.on('interactionCreate', async interaction => {
         const { commandName } = interaction;
 
         if (['start-queue', 'stop-queue', 'next'].includes(commandName)) {
-            if (!isAdmin(member)) {
-                return interaction.reply({ content: "❌ Restricted access.", ephemeral: true });
-            }
+            if (!isAdmin(member)) return interaction.reply({ content: "❌ Restricted access.", ephemeral: true });
         }
 
         await interaction.deferReply({ ephemeral: true });
@@ -198,7 +212,7 @@ client.on('interactionCreate', async interaction => {
 
     if (interaction.isButton()) {
         if (interaction.customId === 'join') {
-            if (!member.voice.channel) return interaction.reply({ content: "❌ Join the VC first!", ephemeral: true });
+            if (!member.voice.channel) return interaction.reply({ content: "❌ Join VC first!", ephemeral: true });
             if (data.queue.includes(interaction.user.id) || data.currentSpeaker === interaction.user.id) 
                 return interaction.reply({ content: "Already in line!", ephemeral: true });
             data.queue.push(interaction.user.id);
@@ -214,9 +228,7 @@ client.on('interactionCreate', async interaction => {
         }
 
         if (interaction.customId === 'finished') {
-            if (interaction.user.id !== data.currentSpeaker) {
-                return interaction.reply({ content: "Not your turn!", ephemeral: true });
-            }
+            if (interaction.user.id !== data.currentSpeaker) return interaction.reply({ content: "Not your turn!", ephemeral: true });
             await handleNextSpeaker(interaction.channel, data);
         }
 
@@ -225,4 +237,4 @@ client.on('interactionCreate', async interaction => {
     }
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client.login(BOT_TOKEN);
