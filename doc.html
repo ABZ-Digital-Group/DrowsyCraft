@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ajAntiXray Documentation</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 40px auto;
+            padding: 0 20px;
+            background-color: #f4f4f9;
+        }
+        .container {
+            background: #fff;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #2980b9;
+            margin-top: 30px;
+            border-left: 5px solid #3498db;
+            padding-left: 15px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+        th {
+            background-color: #3498db;
+            color: white;
+        }
+        tr:hover {
+            background-color: #f1f1f1;
+        }
+        code {
+            background: #e8e8e8;
+            padding: 2px 5px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+        }
+        .note {
+            background-color: #fff3cd;
+            border-left: 5px solid #ffecb5;
+            padding: 15px;
+            margin: 20px 0;
+            font-style: italic;
+        }
+        @media print {
+            body { background: none; margin: 0; }
+            .container { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>ajAntiXray Documentation</h1>
+    <p><strong>Version:</strong> 2.0.5+ | <strong>Compatibility:</strong> 1.8.8 – 1.21.x</p>
+    
+    <p>A high-performance, lightweight tool for detecting potential X-rayers on your Minecraft server by monitoring ore mining rates.</p>
+
+    <h2>1. Key Features</h2>
+    <ul>
+        <li><strong>Real-time Notifications:</strong> Instant alerts for staff when players exceed mining thresholds.</li>
+        <li><strong>Flexible Tracking:</strong> Monitors any block type defined in the config.</li>
+        <li><strong>Modern Messaging:</strong> Full MiniMessage support for colorful, interactive chat alerts.</li>
+        <li><strong>Smart Exclusions:</strong> Integrates with Factions and supports Y-level height limits.</li>
+        <li><strong>Discord Support:</strong> Built-in Webhook integration for remote monitoring.</li>
+    </ul>
+
+    <h2>2. Commands & Permissions</h2>
+    <table>
+        <thead>
+            <tr>
+                <th>Command</th>
+                <th>Permission</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><code>/ajaxr &lt;player&gt;</code></td>
+                <td><code>ajaxr.check</code></td>
+                <td>View mining stats for a specific player.</td>
+            </tr>
+            <tr>
+                <td><code>/ajaxr reload</code></td>
+                <td><code>ajaxr.reload</code></td>
+                <td>Reloads the configuration and messages.</td>
+            </tr>
+            <tr>
+                <td>N/A</td>
+                <td><code>ajaxr.notify</code></td>
+                <td>Receive alerts when someone is flagged.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>3. Configuration Settings</h2>
+    <p>The <code>config.yml</code> allows you to tune the sensitivity of the detection:</p>
+    <ul>
+        <li><strong><code>blocks-to-track</code></strong>: List of materials (e.g., <code>DIAMOND_ORE</code>, <code>DEEPSLATE_DIAMOND_ORE</code>).</li>
+        <li><strong><code>notify-count</code></strong>: The amount of ores that triggers an alert.</li>
+        <li><strong><code>check-interval</code></strong>: How many minutes before the "mined" counter resets.</li>
+        <li><strong><code>ignore-above-y</code></strong>: Useful for ignoring ores found near the surface.</li>
+    </ul>
+
+    <div class="note">
+        <strong>Important Note:</strong> This plugin is a detection tool, not an automated judge. Always spectate a player before taking disciplinary action, as lucky mining streaks or Silk Touch usage can cause false positives.
+    </div>
+
+    <h2>4. Support</h2>
+    <p>For updates and troubleshooting, visit the <a href="https://www.spigotmc.org/resources/ajantixray.68409/">SpigotMC page</a> or join the developer's Discord.</p>
+</div>
+
+</body>
+</html>
