@@ -20,12 +20,3 @@ app.get('/', (req, res) => {
 });
 
 app.listen(PORT, () => console.log(`🚀 DrowsyCraft Web Panel running on port ${PORT}`));
-
-(async () => {
- try {
- if (!process.env.DISCORD_TOKEN) return console.log('DISCORD_TOKEN not set; bot not started');
- require('./index.js');
- } catch (e) {
- console.error('Bot failed to start:', e);
- }
-})();
