@@ -558,6 +558,39 @@ document.addEventListener("DOMContentLoaded", () => {
     const TEBEX_TOKEN = "saqn-6365b61aaf71283b9b28e1121e1ee0355d669001"; 
     const API_URL = "https://headless.tebex.io/api";
 
+    window.copyIP = async function() {
+        const ipBox = document.getElementById('ipBox');
+        if (!ipBox) return;
+
+        const originalText = ipBox.textContent.trim();
+        try {
+            if (navigator.clipboard && window.isSecureContext) {
+                await navigator.clipboard.writeText(originalText);
+            } else {
+                const tempInput = document.createElement('textarea');
+                tempInput.value = originalText;
+                tempInput.setAttribute('readonly', '');
+                tempInput.style.position = 'absolute';
+                tempInput.style.left = '-9999px';
+                document.body.appendChild(tempInput);
+                tempInput.select();
+                document.execCommand('copy');
+                document.body.removeChild(tempInput);
+            }
+
+            ipBox.textContent = 'IP Copied';
+            setTimeout(() => {
+                ipBox.textContent = originalText;
+            }, 1600);
+        } catch (err) {
+            console.error('Copy failed:', err);
+            ipBox.textContent = 'Copy Failed';
+            setTimeout(() => {
+                ipBox.textContent = originalText;
+            }, 1600);
+        }
+    };
+
     fetchStoreData();
 
     async function fetchStoreData() {
