@@ -19,4 +19,4 @@ app.get('/', (req, res) => {
     res.render('pages/index'); 
 });
 
-app.listen(PORT, () => console.log(`🚀 DrowsyCraft Web Panel running on port ${PORT}`));
+app.listen(PORT, () => console.log(`🚀 DrowsyCraft running on port ${PORT}`));
