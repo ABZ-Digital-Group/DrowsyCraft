@@ -207,3 +207,71 @@ footer .footer-image img{
     height: auto;
     
 }
+
+/* --- Mobile Responsiveness --- */
+@media (max-width: 768px) {
+    /* Header & Nav */
+    header nav {
+        flex-direction: column;
+        height: auto;
+        margin: 20px;
+        gap: 20px;
+    }
+    nav img {
+        width: 100%;
+        max-width: 300px;
+        height: auto;
+    }
+    nav ul {
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+        gap: 15px;
+    }
+    nav ul li {
+        margin-right: 0;
+    }
+
+    /* Main Content Sections */
+    .gamemodes, .version-support, .staff-applications, .team {
+        flex-direction: column;
+        height: auto;
+        padding: 40px 20px;
+        text-align: center;
+        gap: 30px;
+    }
+    .gamemodes img, .version-support img, .staff-applications img, .team img {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    /* Rules Section */
+    .rules {
+        margin: 20px;
+        padding: 20px;
+    }
+    .rules p {
+        margin: 20px 0; /* Override the 200px margin for mobile */
+    }
+
+    /* Footer */
+    footer div {
+        flex-direction: column;
+        gap: 30px;
+    }
+    footer .quick-links, footer .footer-image {
+        align-items: center;
+        justify-content: center;
+    }
+    footer .quick-links ul li {
+        text-align: center;
+    }
+    footer .webstore .webstore-content {
+        width: 90%; /* Let it shrink on small screens */
+        max-width: 400px;
+    }
+    footer .footer-image img {
+        width: 100%;
+        max-width: 400px;
+    }
+}
