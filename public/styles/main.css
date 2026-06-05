@@ -140,7 +140,6 @@ footer{
     background-color: #3C9CE4;
     color: white;
     text-align: center;
-    padding: 10px;
     height: auto;
     width: 100%;
 }
@@ -249,9 +248,17 @@ footer .footer-image img{
     .rules {
         margin: 20px;
         padding: 20px;
+        text-align: center;
+    }
+    .rules h1 {
+        font-size: 28px;
     }
     .rules p {
         margin: 20px 0; /* Override the 200px margin for mobile */
+        font-size: 16px;
+    }
+    .rules p span {
+        font-size: 20px;
     }
 
     /* Footer */
