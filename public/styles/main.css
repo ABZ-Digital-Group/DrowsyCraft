@@ -101,6 +101,26 @@ header div img{
     height: auto;
 }
 
+
+
+
+.fullTeam{
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    margin-top: 50px;
+    color: #161B38;
+    padding: 100px;
+    height: 500px;
+}
+.fullTeam img{
+    width: 300px;
+    height: auto;
+}
+
+
+
+
 .rules{
     margin: 100px;
     padding: 100px;

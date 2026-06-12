@@ -22,4 +22,8 @@ app.get('/rules', (req, res) => {
     res.render('pages/rules'); 
 });
 
+app.get('/team', (req, res) => {
+    res.render('pages/team'); 
+});
+
 app.listen(PORT, () => console.log(`🚀 DrowsyCraft running on port ${PORT}`));
