@@ -127,12 +127,17 @@ header div img{
 
 .fullTeam{
     display: flex;
-    justify-content: space-evenly;
+    flex-direction: column;
     align-items: center;
     margin-top: 50px;
     color: #161B38;
     padding: 100px;
-    height: 500px;
+}
+.fullTeam .team-row{
+    display: flex;
+    justify-content: space-evenly;
+    width: 100%;
+    margin-bottom: 40px;
 }
 .fullTeam img{
     width: 300px;
